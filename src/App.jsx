@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar/Navbar';
 import Main from './components/Main/Main';
+import Logo from './components/Navbar/Details/Logo';
+import Search from './components/Navbar/Details/Search';
+import NumResults from './components/Navbar/Details/NumResults';
+import Box from './components/Main/Box';
+import MovieList from './components/Main/ListBox/MovieList';
+import Movie from './components/Main/ListBox/Movie';
+import WatchedSummary from './components/Main/WatchedBox/WatchedSummary';
+import WatchedMovieList from './components/Main/WatchedBox/WatchedMovieList';
 
 const tempMovieData = [
   {
@@ -50,10 +58,28 @@ const tempWatchedData = [
 ];
 
 export default function App() {
+  const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
   return (
     <>
-      <Navbar />
-      <Main tempMovieData={tempMovieData} tempWatchedData={tempWatchedData} />
+      <Navbar>
+        <Logo />
+        <Search />
+        <NumResults movies={movies} />
+      </Navbar>
+      <Main>
+        <Box>
+          <MovieList>
+            {movies?.map(movie => (
+              <Movie movie={movie} key={movie.imdbID} />
+            ))}
+          </MovieList>
+        </Box>
+        <Box>
+          <WatchedSummary watched={watched} />
+          <WatchedMovieList watched={watched} />
+        </Box>
+      </Main>
     </>
   );
 }
