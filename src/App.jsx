@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './components/Navbar/Navbar';
 import Main from './components/Main/Main';
 import Logo from './components/Navbar/Details/Logo';
@@ -56,30 +56,131 @@ const tempWatchedData = [
     userRating: 9,
   },
 ];
-
+const KEY = 'd818a66c';
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [query, setQuery] = useState('');
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [watched, setWatched] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+
+  /*
+  useEffect(() => {
+    console.log('After initialization render');
+  }, []);
+
+  useEffect(() => {
+    console.log('after every render');
+  });
+
+  useEffect(() => {
+    console.log('D');
+  }, [query]);
+
+  console.log('during render');
+  */
+
+  function handlerSelectMovie(id) {
+    setSelectedId(selectedId => (selectedId === id ? null : id));
+    console.log(selectedId);
+  }
+
+  function handlerCloseMovie() {
+    setSelectedId(null);
+  }
+  useEffect(() => {
+    async function fetchMovies() {
+      try {
+        setIsLoading(true);
+        setError('');
+
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+        );
+
+        if (!res.ok)
+          throw new Error('Something went wrong with fetching movies');
+
+        const data = await res.json();
+        if (data.Response === 'False') throw new Error('Movie not found');
+
+        setMovies(data.Search);
+        setError('');
+      } catch (err) {
+        console.log(err.message);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    if (query.length < 3) {
+      setMovies([]);
+      setError('');
+      return;
+    }
+    fetchMovies();
+  }, [query]);
+
   return (
     <>
       <Navbar>
         <Logo />
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </Navbar>
       <Main>
         <Box>
-          <MovieList>
-            {movies?.map(movie => (
-              <Movie movie={movie} key={movie.imdbID} />
-            ))}
-          </MovieList>
+          {isLoading && <Loader />}
+          {!isLoading && !error && (
+            <MovieList>
+              {movies?.map(movie => (
+                <Movie
+                  movie={movie}
+                  key={movie.imdbID}
+                  onSelectMovie={handlerSelectMovie}
+                />
+              ))}
+            </MovieList>
+          )}
+          {error && <Error message={error} />}
         </Box>
         <Box>
-          <WatchedSummary watched={watched} />
-          <WatchedMovieList watched={watched} />
+          {selectedId ? (
+            <MovieDetails
+              selectedId={selectedId}
+              onCloseMovie={handlerCloseMovie}
+            />
+          ) : (
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedMovieList watched={watched} />
+            </>
+          )}
         </Box>
       </Main>
     </>
+  );
+}
+
+function Loader() {
+  return <p className="loader">Loading ...</p>;
+}
+function Error({ message }) {
+  return (
+    <p className="error">
+      <span>⛔</span> {message}
+    </p>
+  );
+}
+
+function MovieDetails({ selectedId, onCloseMovie }) {
+  return (
+    <div className="detail">
+      {selectedId}
+      <button className="btn-back" onClick={onCloseMovie}>
+        &larr;
+      </button>
+    </div>
   );
 }
