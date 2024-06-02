@@ -9,6 +9,7 @@ import MovieList from './components/Main/ListBox/MovieList';
 import Movie from './components/Main/ListBox/Movie';
 import WatchedSummary from './components/Main/WatchedBox/WatchedSummary';
 import WatchedMovieList from './components/Main/WatchedBox/WatchedMovieList';
+import MovieDetails from './components/Main/MovieDetails';
 
 const tempMovieData = [
   {
@@ -150,6 +151,7 @@ export default function App() {
             <MovieDetails
               selectedId={selectedId}
               onCloseMovie={handlerCloseMovie}
+              key={selectedId}
             />
           ) : (
             <>
@@ -163,7 +165,7 @@ export default function App() {
   );
 }
 
-function Loader() {
+export function Loader() {
   return <p className="loader">Loading ...</p>;
 }
 function Error({ message }) {
@@ -171,16 +173,5 @@ function Error({ message }) {
     <p className="error">
       <span>⛔</span> {message}
     </p>
-  );
-}
-
-function MovieDetails({ selectedId, onCloseMovie }) {
-  return (
-    <div className="detail">
-      {selectedId}
-      <button className="btn-back" onClick={onCloseMovie}>
-        &larr;
-      </button>
-    </div>
   );
 }
