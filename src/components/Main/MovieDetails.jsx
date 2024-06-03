@@ -33,6 +33,7 @@ export default function MovieDetails({
     Director: director,
     Genre: genre,
   } = movie;
+
   function handlerAdd() {
     const newWatchedMovie = {
       imdbId: selectedId,
@@ -75,15 +76,14 @@ export default function MovieDetails({
     function callback(e) {
       if (e.code === 'Escape') {
         onCloseMovie();
-        // console.log('Closing');
       }
     }
 
     document.addEventListener('keydown', callback);
 
     return () => document.removeEventListener('keydown', callback);
-
   }, [onCloseMovie]);
+
   return (
     <div className="details">
       {isLoading ? (
