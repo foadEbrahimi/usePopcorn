@@ -1,9 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import StarRating from '../StarRating';
 import { Loader } from '../../App';
-export default function MovieDetails({ selectedId, onCloseMovie }) {
+export default function MovieDetails({
+  selectedId,
+  watchedMovie,
+  onCloseMovie,
+  onAddWatched,
+  KEY,
+}) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [userRating, setUserRating] = useState('');
+
+  const isWatched = watchedMovie
+    .map(movie => movie.imdbId)
+    .includes(selectedId);
+    
+  // console.log(isWatched);
+  const watchedUserRating = watchedMovie.find(
+    movie => movie.imdbId === selectedId
+  )?.userRating;
 
   const {
     Title: title,
@@ -17,7 +33,19 @@ export default function MovieDetails({ selectedId, onCloseMovie }) {
     Director: director,
     Genre: genre,
   } = movie;
-  console.log(title, year);
+  function handlerAdd() {
+    const newWatchedMovie = {
+      imdbId: selectedId,
+      title,
+      year,
+      poster,
+      imdbRating: Number(imdbRating),
+      runtime: Number(runtime.split(' ').at(0)),
+      userRating,
+    };
+    onAddWatched(newWatchedMovie);
+    onCloseMovie();
+  }
   useEffect(
     function () {
       async function getMovieDetails() {
@@ -60,7 +88,22 @@ export default function MovieDetails({ selectedId, onCloseMovie }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating maxRating={10} size={24} />
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handlerAdd}>
+                      + Add to list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>You Rated this movie {watchedUserRating} <span>⭐</span></p>
+              )}
             </div>
             <p>
               <em>{plot}</em>
