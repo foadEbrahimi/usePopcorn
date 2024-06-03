@@ -15,7 +15,7 @@ export default function MovieDetails({
   const isWatched = watchedMovie
     .map(movie => movie.imdbId)
     .includes(selectedId);
-    
+
   // console.log(isWatched);
   const watchedUserRating = watchedMovie.find(
     movie => movie.imdbId === selectedId
@@ -56,13 +56,34 @@ export default function MovieDetails({
         const data = await res.json();
         setMovie(data);
         setIsLoading(false);
-        console.log(data);
+        // console.log(data);
       }
       getMovieDetails();
     },
     [selectedId]
   );
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+    return () => {
+      document.title = 'usePopcorn';
+      // console.log(`Clean up effect for movie ${title}`);
+    };
+  }, [title]);
 
+  useEffect(() => {
+    function callback(e) {
+      if (e.code === 'Escape') {
+        onCloseMovie();
+        // console.log('Closing');
+      }
+    }
+
+    document.addEventListener('keydown', callback);
+
+    return () => document.removeEventListener('keydown', callback);
+
+  }, [onCloseMovie]);
   return (
     <div className="details">
       {isLoading ? (
@@ -102,7 +123,9 @@ export default function MovieDetails({
                   )}
                 </>
               ) : (
-                <p>You Rated this movie {watchedUserRating} <span>⭐</span></p>
+                <p>
+                  You Rated this movie {watchedUserRating} <span>⭐</span>
+                </p>
               )}
             </div>
             <p>

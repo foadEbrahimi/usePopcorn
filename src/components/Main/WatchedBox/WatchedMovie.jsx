@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function WatchedMovie({ movie, onDelete }) {
   return (
-    <li>
+    <li key={movie.imdbId}>
       <img src={movie.poster} alt={`${movie.title} poster`} />
       <h3>{movie.title}</h3>
       <div>
