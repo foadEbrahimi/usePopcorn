@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import StarRating from '../StarRating';
+
 import { Loader } from '../../App';
+import StarRating from '../StarRating';
+
 export default function MovieDetails({
   selectedId,
   watchedMovie,
@@ -47,6 +49,7 @@ export default function MovieDetails({
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   }
+
   useEffect(
     function () {
       async function getMovieDetails() {
