@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-
+import useKey from '../../hooks/useKey.js';
 import { Loader } from '../../App';
 import StarRating from '../StarRating';
 
@@ -61,6 +61,8 @@ export default function MovieDetails({
     onCloseMovie();
   }
 
+  useKey('escape', onCloseMovie);
+
   useEffect(
     function () {
       async function getMovieDetails() {
@@ -77,6 +79,7 @@ export default function MovieDetails({
     },
     [selectedId]
   );
+
   useEffect(() => {
     if (!title) return;
     document.title = `Movie | ${title}`;
@@ -85,18 +88,6 @@ export default function MovieDetails({
       // console.log(`Clean up effect for movie ${title}`);
     };
   }, [title]);
-
-  useEffect(() => {
-    function callback(e) {
-      if (e.code === 'Escape') {
-        onCloseMovie();
-      }
-    }
-
-    document.addEventListener('keydown', callback);
-
-    return () => document.removeEventListener('keydown', callback);
-  }, [onCloseMovie]);
 
   return (
     <div className="details">
